@@ -2,47 +2,253 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Transport Calculator (Free Version)</title>
+<title>Reakgona Tours - Transport Calculator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css  " rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css  "/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js  "></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js  "></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
-    background: #0f172a;
-    color: white;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+.brand-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.6);
+    border-radius: 15px;
+    border: 1px solid #333;
+}
+.brand-title {
+    color: #4CAF50;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.brand-tagline {
+    color: #888;
+    font-size: 0.9rem;
+    letter-spacing: 3px;
 }
 .card {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid #333;
     border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.1);
+}
+.form-control, .form-select {
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+.form-control:focus, .form-select:focus {
+    background: #222;
+    border-color: #4CAF50;
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+.form-label {
+    color: #4CAF50;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.btn-success {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+.btn-success:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+.btn-info {
+    background: #2a2a2a;
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+.btn-info:hover {
+    background: #4CAF50;
+    color: #000;
 }
 #map {
     height: 300px;
     border-radius: 10px;
+    border: 2px solid #4CAF50;
 }
 .result-box {
-    background: #111827;
-    padding: 15px;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    padding: 25px;
+    border-radius: 12px;
+    border: 2px solid #4CAF50;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
+    min-height: 400px;
+}
+.result-box h5 {
+    color: #4CAF50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.price-display {
+    background: rgba(76, 175, 80, 0.15);
+    border-left: 4px solid #4CAF50;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+    animation: priceReveal 0.5s ease-out;
+}
+@keyframes priceReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.price-display .final-price {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #4CAF50;
+    text-shadow: 0 0 10px rgba(76,175,80,0.5);
+}
+.price-display .rate-type {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 5px;
 }
 .toll-badge {
     font-size: 0.75rem;
-    background: #334155;
-    padding: 2px 6px;
+    background: #4CAF50;
+    color: #000;
+    padding: 3px 8px;
     border-radius: 4px;
-    margin-left: 5px;
+    margin-left: 8px;
+    font-weight: 700;
 }
 .auto-toll-note {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: #4CAF50;
     margin-top: 5px;
+    font-style: italic;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border: none;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
+}
+.btn-primary:disabled {
+    background: #444;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.5;
+}
+.rate-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.rate-toggle .form-check {
+    flex: 1;
+}
+.rate-toggle .form-check-input:checked {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+.rate-toggle .form-check-label {
+    color: #ccc;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.rate-toggle .form-check-input:checked + .form-check-label {
+    color: #4CAF50;
+    font-weight: 600;
+}
+.collapse-card {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #4CAF50;
+    border-radius: 12px;
+}
+.table-dark {
+    --bs-table-bg: #1a1a1a;
+    --bs-table-striped-bg: #252525;
+    border-color: #444;
+}
+.text-warning { color: #4CAF50 !important; }
+.text-primary { color: #4CAF50 !important; }
+h3, h4, h5, h6 { color: #4CAF50; }
+.shadow-lg { box-shadow: 0 10px 40px rgba(76, 175, 80, 0.15) !important; }
+.address-section, .client-section {
+    background: rgba(76, 175, 80, 0.05);
+    border: 1px solid #4CAF50;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.section-title {
+    color: #4CAF50;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.required-star {
+    color: #ff4444;
+    font-weight: 700;
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+@media (max-width: 576px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+.logo-preview {
+    max-width: 100px;
+    max-height: 50px;
+    margin: 10px 0;
+    border: 1px solid #4CAF50;
+    border-radius: 5px;
+    display: none;
 }
 </style>
 </head>
@@ -52,43 +258,148 @@ body {
 <div class="container py-5">
 <div class="card p-4 shadow-lg">
 
-<h3 class="text-center mb-4">🚚 Transport Pricing Calculator (Free)</h3>
+<!-- BRAND HEADER -->
+<div class="brand-header">
+    <h1 class="brand-title">🧳 Reakgona Tours</h1>
+    <p class="brand-tagline">TRAVEL WITH EASE</p>
+</div>
+
+<h3 class="text-center mb-4" style="color: #4CAF50;">🚚 Transport Pricing Calculator</h3>
+
+<!-- LOGO UPLOAD SECTION -->
+<div class="client-section">
+    <div class="section-title">🖼️ Company Logo (Optional)</div>
+    <label class="form-label">Upload your logo for PDF quotes</label>
+    <input type="file" id="logoUpload" class="form-control mb-2" accept="image/*">
+    <small class="text-muted" style="font-size:0.7rem; color:#666;">Supported: PNG, JPG, JPEG (max 50KB recommended)</small>
+    <img id="logoPreview" class="logo-preview" alt="Logo preview">
+    <button type="button" class="btn btn-sm btn-info mt-2" onclick="clearLogo()">🗑️ Remove Logo</button>
+</div>
 
 <div class="row">
 
 <!-- LEFT -->
 <div class="col-md-6">
 
-<label>Pickup Location</label>
-<input id="from" class="form-control mb-3" placeholder="e.g. Witbank">
+<!-- CLIENT INFORMATION SECTION -->
+<div class="client-section">
+    <div class="section-title">👤 Client Information</div>
+    
+    <div class="form-row">
+        <div>
+            <label class="form-label">Client Name <span class="required-star">*</span></label>
+            <input id="clientName" class="form-control mb-2" placeholder="e.g. John Doe" required>
+        </div>
+        <div>
+            <label class="form-label">Pickup Date <span class="required-star">*</span></label>
+            <input id="pickupDate" type="date" class="form-control mb-2" required>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <div>
+            <label class="form-label">Contact Number <span class="required-star">*</span></label>
+            <input id="clientPhone" type="tel" class="form-control mb-2" placeholder="e.g. 082 123 4567" required>
+        </div>
+        <div>
+            <label class="form-label">Email (Optional)</label>
+            <input id="clientEmail" type="email" class="form-control mb-2" placeholder="e.g. john@email.com">
+        </div>
+    </div>
+    
+    <label class="form-label">Additional Notes (Optional)</label>
+    <textarea id="clientNotes" class="form-control" rows="2" placeholder="e.g. 4 passengers, 2 large bags, child seat required"></textarea>
+</div>
 
-<label>Drop-off Location</label>
-<input id="to" class="form-control mb-3" placeholder="e.g. Johannesburg">
+<!-- PICKUP ADDRESS SECTION -->
+<div class="address-section">
+    <div class="section-title">📍 Pickup Location</div>
+    
+    <label class="form-label">Street / Landmark (Optional)</label>
+    <input id="fromStreet" class="form-control mb-2" placeholder="e.g. OR Tambo Airport OR Main Street">
+    <small class="text-muted" style="font-size:0.7rem; color:#666;">Leave blank if unsure - Town/Province is enough</small>
+    
+    <label class="form-label mt-2">Town / City <span class="required-star">*</span></label>
+    <input id="fromTown" class="form-control mb-2" placeholder="e.g. Kroonstad" required>
+    
+    <label class="form-label">Province <span class="required-star">*</span></label>
+    <select id="fromProvince" class="form-select mb-2" required>
+        <option value="">Select Province</option>
+        <option value="Eastern Cape">Eastern Cape</option>
+        <option value="Free State">Free State</option>
+        <option value="Gauteng">Gauteng</option>
+        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+        <option value="Limpopo">Limpopo</option>
+        <option value="Mpumalanga">Mpumalanga</option>
+        <option value="Northern Cape">Northern Cape</option>
+        <option value="North West">North West</option>
+        <option value="Western Cape">Western Cape</option>
+    </select>
+</div>
+
+<!-- DROP-OFF ADDRESS SECTION -->
+<div class="address-section">
+    <div class="section-title">🏁 Drop-off Location</div>
+    
+    <label class="form-label">Street / Landmark (Optional)</label>
+    <input id="toStreet" class="form-control mb-2" placeholder="e.g. Sandton City OR Du Toitspan Road">
+    <small class="text-muted" style="font-size:0.7rem; color:#666;">Leave blank if unsure - Town/Province is enough</small>
+    
+    <label class="form-label mt-2">Town / City <span class="required-star">*</span></label>
+    <input id="toTown" class="form-control mb-2" placeholder="e.g. Kimberley" required>
+    
+    <label class="form-label">Province <span class="required-star">*</span></label>
+    <select id="toProvince" class="form-select mb-2" required>
+        <option value="">Select Province</option>
+        <option value="Eastern Cape">Eastern Cape</option>
+        <option value="Free State">Free State</option>
+        <option value="Gauteng">Gauteng</option>
+        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+        <option value="Limpopo">Limpopo</option>
+        <option value="Mpumalanga">Mpumalanga</option>
+        <option value="Northern Cape">Northern Cape</option>
+        <option value="North West">North West</option>
+        <option value="Western Cape">Western Cape</option>
+    </select>
+</div>
 
 <div id="map" class="mb-3"></div>
 
-<label>Vehicle Type</label>
-<select id="vehicle" class="form-control mb-3" onchange="setVehicle()">
+<label class="form-label">Vehicle Type</label>
+<select id="vehicle" class="form-select mb-3" onchange="setVehicle()">
 <option value="sedan">Sedan</option>
 <option value="bakkie">Bakkie</option>
 <option value="van">Minibus / Van (Hyundai H1)</option>
 <option value="truck">Truck</option>
 </select>
 
-<label>Fuel Price (R/L)</label>
+<label class="form-label">Fuel Price (R/L)</label>
 <input id="fuelPrice" type="number" class="form-control mb-3" value="23">
 
-<label>Tolls (R) <span class="toll-badge">Auto-calculated</span></label>
+<label class="form-label">Tolls (R) <span class="toll-badge">Auto-calculated</span></label>
 <input id="tolls" type="number" class="form-control mb-1" value="0" readonly>
 <div class="auto-toll-note">💡 Tolls auto-filled based on route. Edit manually if needed.</div>
 
-<label>Driver Rate (R/hour)</label>
-<input id="driverRate" type="number" class="form-control mb-3" value="150">
+<!-- DRIVER RATE TYPE TOGGLE -->
+<label class="form-label mt-3">Driver Rate Type</label>
+<div class="rate-toggle">
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="rateType" id="rateHour" value="hour" checked onchange="toggleRateInput()">
+        <label class="form-check-label" for="rateHour">R / Hour</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="rateType" id="rateKm" value="km" onchange="toggleRateInput()">
+        <label class="form-check-label" for="rateKm">R / Kilometer</label>
+    </div>
+</div>
 
-<label>Profit %</label>
+<label class="form-label" id="driverRateLabel">Driver Rate (R/hour)</label>
+<input id="driverRate" type="number" class="form-control mb-3" value="150" min="0" step="0.01">
+
+<label class="form-label">Profit %</label>
 <input id="profit" type="number" class="form-control mb-3" value="20">
 
-<button class="btn btn-success w-100" onclick="getDistance()">Calculate Price</button>
+<button class="btn btn-success w-100" onclick="getDistance()">🔢 Calculate Price</button>
 <button class="btn btn-info w-100 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#tollReference">📋 View SA Toll Prices (Mar 2026)</button>
 
 </div>
@@ -98,20 +409,31 @@ body {
 
 <div class="result-box">
 <h5>📊 Quote Breakdown</h5>
-<p id="output">Enter locations and calculate...</p>
+<p id="output" style="color: #ccc;">Enter client info and locations, then click Calculate Price to see your quote...</p>
 
-<button class="btn btn-primary w-100 mt-3" onclick="generatePDF()">Download PDF Quote</button>
+<!-- CALCULATED PRICE DISPLAY (Hidden until calculation) -->
+<div id="priceDisplay" class="price-display" style="display: none;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="color:#888; font-size:0.95rem;">FINAL QUOTE</span>
+        <span id="rateTypeBadge" class="badge" style="background:#333; color:#4CAF50; font-size:0.75rem;">R/Hour</span>
+    </div>
+    <div class="final-price" id="finalPriceDisplay">R0.00</div>
+    <div class="rate-type" id="rateTypeNote">Driver charged per hour</div>
+</div>
+
+<button id="pdfBtn" class="btn btn-primary w-100 mt-3" onclick="generatePDF()" disabled>📄 Download PDF Quote</button>
+<small class="text-muted d-block text-center mt-2" style="font-size:0.8rem;">Calculate first to enable PDF download</small>
 </div>
 
 </div>
 
 </div>
 
-<!-- TOLL REFERENCE SECTION (ADDED) -->
+<!-- TOLL REFERENCE SECTION -->
 <div class="collapse mt-4" id="tollReference">
-<div class="card p-3" style="background:#1e293b; max-height:500px; overflow-y:auto;">
-<h5 class="text-warning mb-3">🇿🇦 South Africa Road Toll Prices - Class 1 (Light Vehicles) | Effective 1 March 2026</h5>
-<p class="small text-muted">💡 Class 1: Motorcycles, motorcars, minibuses, light delivery vehicles. All prices include VAT. +3.12% CPI increase applied.</p>
+<div class="card p-3 collapse-card" style="max-height:500px; overflow-y:auto;">
+<h5 class="text-warning mb-3">🇿 South Africa Road Toll Prices - Class 1 (Light Vehicles) | Effective 1 March 2026</h5>
+<p class="small text-muted" style="color: #888;">💡 Class 1: Motorcycles, motorcars, minibuses, light delivery vehicles. All prices include VAT. +3.12% CPI increase applied.</p>
 
 <!-- N1 JHB-CPT -->
 <h6 class="mt-3 text-primary">🔹 N1: Johannesburg ↔ Cape Town (SANRAL)</h6>
@@ -273,79 +595,85 @@ body {
 
 </div>
 </div>
-<!-- END TOLL REFERENCE -->
 
 </div>
 </div>
 
 <script>
+// ============== LOGO HANDLING ==============
+let logoBase64 = null; // Will store uploaded logo
+
+// Handle logo upload
+document.getElementById('logoUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Check file size (recommend under 50KB)
+    if (file.size > 100 * 1024) {
+        alert('Please upload an image under 100KB for best performance.');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        logoBase64 = event.target.result;
+        // Show preview
+        const preview = document.getElementById('logoPreview');
+        preview.src = logoBase64;
+        preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
+// Clear uploaded logo
+function clearLogo() {
+    logoBase64 = null;
+    document.getElementById('logoUpload').value = '';
+    document.getElementById('logoPreview').style.display = 'none';
+}
 
 // ============== SOUTH AFRICA TOLL PLAZA DATABASE ==============
-// Class 1 prices effective March 2026 | Coordinates approximate for route matching
 const tollPlazas = [
-  // N1 Johannesburg - Cape Town
   {name:"Grasmere Main", lat:-26.2833, lon:28.2167, price:27.50, route:"N1-JHB-CPT"},
   {name:"Grasmere Ramp", lat:-26.2833, lon:28.2167, price:14.00, route:"N1-JHB-CPT"},
   {name:"Vaal", lat:-26.7167, lon:27.8833, price:91.50, route:"N1-JHB-CPT"},
   {name:"Verkeerdevlei", lat:-28.2833, lon:26.7167, price:78.50, route:"N1-JHB-CPT"},
   {name:"Huguenot Tunnel", lat:-33.7167, lon:19.0833, price:54.50, route:"N1-JHB-CPT"},
-  
-  // N1 Pretoria - Beit Bridge
   {name:"Pumulani", lat:-25.5833, lon:28.1833, price:16.50, route:"N1-PTA-BEIT"},
   {name:"Carousel", lat:-25.4167, lon:28.3333, price:75.00, route:"N1-PTA-BEIT"},
   {name:"Kranskop", lat:-24.7833, lon:28.6167, price:61.50, route:"N1-PTA-BEIT"},
   {name:"Nyl", lat:-24.3833, lon:28.7167, price:79.50, route:"N1-PTA-BEIT"},
   {name:"Capricorn", lat:-23.8167, lon:29.1833, price:63.50, route:"N1-PTA-BEIT"},
   {name:"Baobab", lat:-23.2167, lon:29.4833, price:61.50, route:"N1-PTA-BEIT"},
-  
-  // N2 North Coast
   {name:"Mtunzini", lat:-28.9833, lon:31.4167, price:63.50, route:"N2-NORTH"},
   {name:"Mvoti", lat:-29.4167, lon:31.2833, price:18.50, route:"N2-NORTH"},
   {name:"Othongathi", lat:-29.6833, lon:31.1167, price:15.50, route:"N2-NORTH"},
-  
-  // N2 South Coast
   {name:"Oribi", lat:-30.7833, lon:30.3167, price:41.00, route:"N2-SOUTH"},
-  
-  // N2 Garden Route
   {name:"Tsitsikamma", lat:-34.0167, lon:23.8833, price:73.00, route:"N2-GARDEN"},
-  
-  // N3 Johannesburg - Durban
   {name:"De Hoek", lat:-26.6833, lon:28.4167, price:67.00, route:"N3-JHB-DBN"},
   {name:"Wilge", lat:-27.0167, lon:28.8833, price:94.00, route:"N3-JHB-DBN"},
   {name:"Tugela", lat:-28.6833, lon:30.1167, price:100.00, route:"N3-JHB-DBN"},
   {name:"Mooi River", lat:-29.1167, lon:30.0833, price:70.00, route:"N3-JHB-DBN"},
   {name:"Mariannhill", lat:-29.8167, lon:30.8833, price:16.50, route:"N3-JHB-DBN"},
-  
-  // N4 Platinum Corridor
   {name:"Swartruggens", lat:-25.7167, lon:26.6833, price:103.00, route:"N4-PLAT"},
   {name:"Marikana", lat:-25.8833, lon:27.4167, price:30.00, route:"N4-PLAT"},
   {name:"Brits", lat:-25.6167, lon:27.7833, price:20.00, route:"N4-PLAT"},
   {name:"Doornpoort", lat:-25.6833, lon:28.1167, price:20.00, route:"N4-PLAT"},
-  
-  // N4 Maputo Corridor
   {name:"Diamond Hill", lat:-25.7167, lon:28.4833, price:51.00, route:"N4-MAP"},
   {name:"Middelburg", lat:-25.7833, lon:29.4167, price:84.00, route:"N4-MAP"},
   {name:"Machado", lat:-25.6167, lon:30.9833, price:126.00, route:"N4-MAP"},
   {name:"Nkomazi", lat:-25.4833, lon:31.8167, price:95.00, route:"N4-MAP"},
-  
-  // N4 Hartbeespoort
   {name:"Pelindaba", lat:-25.6167, lon:27.6167, price:8.00, route:"N4-HART"},
   {name:"Quagga", lat:-25.5833, lon:27.5167, price:6.50, route:"N4-HART"},
-  
-  // N17
   {name:"Gosforth Park", lat:-26.1167, lon:28.4833, price:17.00, route:"N17"},
   {name:"Dalpark", lat:-26.2833, lon:28.8167, price:15.50, route:"N17"},
   {name:"Leandra", lat:-26.5167, lon:29.1833, price:50.50, route:"N17"},
   {name:"Trichardt", lat:-26.6833, lon:29.4167, price:25.00, route:"N17"},
   {name:"Ermelo", lat:-26.5167, lon:29.9833, price:45.00, route:"N17"},
-  
-  // R30/R730/R34
   {name:"Brandfort", lat:-28.8167, lon:26.6833, price:62.50, route:"R30"}
 ];
 
 // ============== HELPER FUNCTIONS ==============
-
-// Calculate distance between two lat/lon points (Haversine formula)
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = deg2rad(lat2-lat1);
@@ -358,171 +686,482 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 }
 function deg2rad(deg) { return deg * (Math.PI/180); }
 
-// Check if a point is near a line segment (simplified corridor check)
 function isPointNearRoute(plazaLat, plazaLon, startLat, startLon, endLat, endLon, maxDistKm=15) {
-  // Quick bounding box check first
   const minLat = Math.min(startLat, endLat) - 0.5;
   const maxLat = Math.max(startLat, endLat) + 0.5;
   const minLon = Math.min(startLon, endLon) - 0.5;
   const maxLon = Math.max(startLon, endLon) + 0.5;
-  
-  if (plazaLat < minLat || plazaLat > maxLat || plazaLon < minLon || plazaLon > maxLon) {
-    return false;
-  }
-  
-  // Check distance to start and end points
+  if (plazaLat < minLat || plazaLat > maxLat || plazaLon < minLon || plazaLon > maxLon) return false;
   const distStart = getDistanceFromLatLonInKm(plazaLat, plazaLon, startLat, startLon);
   const distEnd = getDistanceFromLatLonInKm(plazaLat, plazaLon, endLat, endLon);
   const routeDist = getDistanceFromLatLonInKm(startLat, startLon, endLat, endLon);
-  
-  // If plaza is within corridor (triangle inequality approximation)
-  if (distStart + distEnd <= routeDist + maxDistKm) {
-    return true;
-  }
-  return false;
+  return (distStart + distEnd <= routeDist + maxDistKm);
 }
 
-// Auto-calculate tolls for a route
 function calculateAutoTolls(startLat, startLon, endLat, endLon) {
   let totalTolls = 0;
   let matchedPlazas = [];
-  
   for (const plaza of tollPlazas) {
     if (isPointNearRoute(plaza.lat, plaza.lon, startLat, startLon, endLat, endLon)) {
       totalTolls += plaza.price;
       matchedPlazas.push(plaza.name);
     }
   }
-  
   return { total: totalTolls, plazas: matchedPlazas };
 }
 
-// MAP SETUP
+// ============== BUILD ADDRESS FROM PARTS ==============
+function buildAddress(street, town, province) {
+    let addressParts = [];
+    if (street && street.trim() !== '' && street.trim().length > 3) {
+        addressParts.push(street.trim());
+    }
+    if (town && town.trim() !== '') addressParts.push(town.trim());
+    if (province && province.trim() !== '') addressParts.push(province.trim());
+    addressParts.push('South Africa');
+    return addressParts.join(', ');
+}
+
+// ============== GEOCODE WITH FALLBACK ==============
+async function geocodeWithFallback(address, town, province) {
+    let query1 = `${address}, South Africa`;
+    console.log("Search 1:", query1);
+    let result = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query1)}&limit=1`)
+        .then(res => res.json());
+    if (result && result[0]) {
+        console.log("✓ Found with full address");
+        return result[0];
+    }
+    
+    let query2 = `${town}, ${province}, South Africa`;
+    console.log("Search 2:", query2);
+    result = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query2)}&limit=1`)
+        .then(res => res.json());
+    if (result && result[0]) {
+        console.log("✓ Found with town+province");
+        return result[0];
+    }
+    
+    let query3 = `${town}, South Africa`;
+    console.log("Search 3:", query3);
+    result = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query3)}&limit=1`)
+        .then(res => res.json());
+    if (result && result[0]) {
+        console.log("✓ Found with town only");
+        return result[0];
+    }
+    
+    console.log("✗ All searches failed");
+    return null;
+}
+
+// ============== MAP SETUP ==============
 let map = L.map('map').setView([-26.2, 28.0], 6);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-}).addTo(map);
-
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 let marker1, marker2;
 
+// ============== VARIABLES ==============
 let consumption = 8;
 let maintenanceRate = 1.2;
 let finalPrice = 0;
+let currentQuote = {};
+let calculated = false;
 
-// VEHICLE SETTINGS
+// ============== VEHICLE SETTINGS ==============
 function setVehicle() {
-    let v = document.getElementById("vehicle").value;
-
+    const v = document.getElementById("vehicle").value;
     if (v === "sedan") { consumption = 8; maintenanceRate = 1.2; }
     if (v === "bakkie") { consumption = 10; maintenanceRate = 1.8; }
     if (v === "van") { consumption = 10; maintenanceRate = 1.6; }
     if (v === "truck") { consumption = 18; maintenanceRate = 3.5; }
 }
 
-// MAIN FUNCTION
-async function getDistance() {
-
-    let from = document.getElementById("from").value;
-    let to = document.getElementById("to").value;
-
-    try {
-
-        // GEOCODE
-        let start = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(from)}`)
-        .then(res => res.json());
-
-        let end = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(to)}`)
-        .then(res => res.json());
-
-        let startLat = parseFloat(start[0].lat);
-        let startLon = parseFloat(start[0].lon);
-
-        let endLat = parseFloat(end[0].lat);
-        let endLon = parseFloat(end[0].lon);
-
-        // UPDATE MAP
-        if (marker1) map.removeLayer(marker1);
-        if (marker2) map.removeLayer(marker2);
-
-        marker1 = L.marker([startLat, startLon]).addTo(map);
-        marker2 = L.marker([endLat, endLon]).addTo(map);
-
-        map.fitBounds([
-            [startLat, startLon],
-            [endLat, endLon]
-        ]);
-
-        // ROUTE
-        let route = await fetch(`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=false`)
-        .then(res => res.json());
-
-        let distance = route.routes[0].distance / 1000;
-        let time = route.routes[0].duration / 3600;
-
-        // AUTO-CALCULATE TOLLS
-        const tollResult = calculateAutoTolls(startLat, startLon, endLat, endLon);
-        document.getElementById("tolls").value = tollResult.total.toFixed(2);
-        
-        // Show matched plazas in output for transparency
-        const plazaNote = tollResult.plazas.length > 0 ? 
-          `<br><small class="text-info">🛣️ Auto-tolls: ${tollResult.plazas.join(", ")}</small>` : 
-          `<br><small class="text-muted">🛣️ No toll plazas detected on this route</small>`;
-
-        calculateCost(distance, time, plazaNote);
-
-    } catch (error) {
-        alert("Error finding locations. Please try again.");
+// ============== TOGGLE RATE INPUT ==============
+function toggleRateInput() {
+    const rateType = document.querySelector('input[name="rateType"]:checked').value;
+    const label = document.getElementById('driverRateLabel');
+    const input = document.getElementById('driverRate');
+    
+    if (rateType === 'hour') {
+        label.textContent = 'Driver Rate (R/hour)';
+        input.placeholder = 'e.g. 150';
+        if (!input.value || input.value === '0') input.value = '150';
+    } else {
+        label.textContent = 'Driver Rate (R/km)';
+        input.placeholder = 'e.g. 8.50';
+        if (!input.value || input.value === '0') input.value = '8.50';
     }
 }
 
-// COST CALCULATION
-function calculateCost(distance, time, plazaNote="") {
+// ============== SET MINIMUM DATE TO TODAY ==============
+function setMinimumDate() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('pickupDate').min = today;
+    document.getElementById('pickupDate').value = today;
+}
 
-    let fuelPrice = parseFloat(document.getElementById("fuelPrice").value);
-    let tolls = parseFloat(document.getElementById("tolls").value) || 0;
-    let driverRate = parseFloat(document.getElementById("driverRate").value);
-    let profitPercent = parseFloat(document.getElementById("profit").value);
+// ============== VALIDATE CLIENT INFO ==============
+function validateClientInfo() {
+    const clientName = document.getElementById("clientName").value.trim();
+    const pickupDate = document.getElementById("pickupDate").value;
+    const clientPhone = document.getElementById("clientPhone").value.trim();
+    
+    if (!clientName) {
+        alert("Please enter Client Name.");
+        return false;
+    }
+    if (!pickupDate) {
+        alert("Please select Pickup Date.");
+        return false;
+    }
+    if (!clientPhone) {
+        alert("Please enter Contact Number.");
+        return false;
+    }
+    return true;
+}
 
-    let fuelUsed = (distance / 100) * consumption;
-    let fuelCost = fuelUsed * fuelPrice;
+// ============== MAIN CALCULATION FUNCTION ==============
+async function getDistance() {
+    if (!validateClientInfo()) {
+        return;
+    }
+    
+    const fromStreet = document.getElementById("fromStreet").value;
+    const fromTown = document.getElementById("fromTown").value.trim();
+    const fromProvince = document.getElementById("fromProvince").value;
+    
+    const toStreet = document.getElementById("toStreet").value;
+    const toTown = document.getElementById("toTown").value.trim();
+    const toProvince = document.getElementById("toProvince").value;
+    
+    if (!fromTown || !fromProvince) {
+        alert("Please enter at least Town and Province for Pickup Location.");
+        return;
+    }
+    if (!toTown || !toProvince) {
+        alert("Please enter at least Town and Province for Drop-off Location.");
+        return;
+    }
+    
+    const fromAddress = buildAddress(fromStreet, fromTown, fromProvince);
+    const toAddress = buildAddress(toStreet, toTown, toProvince);
+    
+    console.log("From Address:", fromAddress);
+    console.log("To Address:", toAddress);
 
-    let maintenance = distance * maintenanceRate;
-    let driverCost = time * driverRate;
+    try {
+        const start = await geocodeWithFallback(fromAddress, fromTown, fromProvince);
+        const end = await geocodeWithFallback(toAddress, toTown, toProvince);
 
-    let totalCost = fuelCost + maintenance + driverCost + tolls;
-    let profit = totalCost * (profitPercent / 100);
+        if (!start || !end) {
+            alert(`Could not find locations. Please check:\n\n✓ Town spelling (e.g., "Kroonstad" not "Kroonstad City")\n✓ Province selection\n✓ Try using just Town name without street address\n\nSearched:\nFrom: ${fromAddress}\nTo: ${toAddress}`);
+            return;
+        }
 
+        const startLat = parseFloat(start.lat);
+        const startLon = parseFloat(start.lon);
+        const endLat = parseFloat(end.lat);
+        const endLon = parseFloat(end.lon);
+
+        if (marker1) map.removeLayer(marker1);
+        if (marker2) map.removeLayer(marker2);
+        marker1 = L.marker([startLat, startLon]).addTo(map);
+        marker2 = L.marker([endLat, endLon]).addTo(map);
+        map.fitBounds([[startLat, startLon], [endLat, endLon]]);
+
+        const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=false`)
+            .then(res => res.json());
+
+        const distance = route.routes[0].distance / 1000;
+        const time = route.routes[0].duration / 3600;
+
+        const tollResult = calculateAutoTolls(startLat, startLon, endLat, endLon);
+        document.getElementById("tolls").value = tollResult.total.toFixed(2);
+        
+        const plazaNote = tollResult.plazas.length > 0 ? 
+          `<br><small style="color: #4CAF50;">🛣️ Auto-tolls: ${tollResult.plazas.join(", ")}</small>` : 
+          `<br><small style="color: #888;">🛣️ No toll plazas detected on this route</small>`;
+
+        calculateCost(distance, time, plazaNote, fromAddress, toAddress);
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error calculating route. Please try again with simpler location names.");
+    }
+}
+
+// ============== COST CALCULATION ==============
+function calculateCost(distance, time, plazaNote="", from="", to="") {
+    const fuelPrice = parseFloat(document.getElementById("fuelPrice").value) || 23;
+    const tolls = parseFloat(document.getElementById("tolls").value) || 0;
+    const driverRate = parseFloat(document.getElementById("driverRate").value) || 0;
+    const profitPercent = parseFloat(document.getElementById("profit").value) || 0;
+    const rateType = document.querySelector('input[name="rateType"]:checked').value;
+
+    const fuelUsed = (distance / 100) * consumption;
+    const fuelCost = fuelUsed * fuelPrice;
+    const maintenance = distance * maintenanceRate;
+
+    let driverCost, rateDescription;
+    if (rateType === 'hour') {
+        driverCost = time * driverRate;
+        rateDescription = `R${driverRate.toFixed(2)}/hour × ${time.toFixed(1)} hrs`;
+    } else {
+        driverCost = distance * driverRate;
+        rateDescription = `R${driverRate.toFixed(2)}/km × ${distance.toFixed(1)} km`;
+    }
+
+    const totalCost = fuelCost + maintenance + driverCost + tolls;
+    const profit = totalCost * (profitPercent / 100);
     finalPrice = totalCost + profit;
+    
+    currentQuote = {
+        clientName: document.getElementById("clientName").value.trim(),
+        clientPhone: document.getElementById("clientPhone").value.trim(),
+        clientEmail: document.getElementById("clientEmail").value.trim(),
+        clientNotes: document.getElementById("clientNotes").value.trim(),
+        pickupDate: document.getElementById("pickupDate").value,
+        from: from,
+        to: to,
+        distance: distance.toFixed(1),
+        time: time.toFixed(1),
+        fuelCost: fuelCost.toFixed(2),
+        maintenance: maintenance.toFixed(2),
+        driverCost: driverCost.toFixed(2),
+        driverRateType: rateType,
+        driverRate: driverRate.toFixed(2),
+        rateDescription: rateDescription,
+        tolls: tolls.toFixed(2),
+        totalCost: totalCost.toFixed(2),
+        profit: profit.toFixed(2),
+        finalPrice: finalPrice.toFixed(2),
+        date: new Date().toLocaleDateString('en-ZA'),
+        vehicle: document.getElementById("vehicle").options[document.getElementById("vehicle").selectedIndex].text
+    };
 
+    // Update UI - Quote Breakdown (INTERNAL - shows all details)
     document.getElementById("output").innerHTML = `
-        Distance: ${distance.toFixed(1)} km<br>
-        Time: ${time.toFixed(1)} hrs<br><br>
-        Fuel: R${fuelCost.toFixed(2)}<br>
-        Maintenance: R${maintenance.toFixed(2)}<br>
-        Driver: R${driverCost.toFixed(2)}<br>
-        Tolls: R${tolls.toFixed(2)}${plazaNote}<br>
-        <hr>
-        <strong>Total Cost: R${totalCost.toFixed(2)}</strong><br>
-        <strong>Final Quote: R${finalPrice.toFixed(2)}</strong>
+        <strong style="color: #fff;">👤 Client:</strong> <span style="color: #4CAF50;">${currentQuote.clientName}</span><br>
+        <strong style="color: #fff;">📅 Pickup:</strong> <span style="color: #fff;">${currentQuote.pickupDate}</span><br>
+        <strong style="color: #fff;">📍 Route:</strong> <span style="color: #4CAF50;">${from.split(',')[0]} → ${to.split(',')[0]}</span><br>
+        <strong style="color: #fff;">🚗 Vehicle:</strong> <span style="color: #fff;">${currentQuote.vehicle}</span><br>
+        <strong style="color: #fff;">📏 Distance:</strong> <span style="color: #fff;">${distance.toFixed(1)} km</span><br>
+        <strong style="color: #fff;">⏱️ Est. Time:</strong> <span style="color: #fff;">${time.toFixed(1)} hours</span><br><br>
+        <strong style="color: #888;">⛽ Fuel:</strong> <span style="color: #fff;">R${fuelCost.toFixed(2)}</span><br>
+        <strong style="color: #888;">🔧 Maintenance:</strong> <span style="color: #fff;">R${maintenance.toFixed(2)}</span><br>
+        <strong style="color: #888;">👨‍✈️ Driver:</strong> <span style="color: #fff;">R${driverCost.toFixed(2)}</span> 
+        <small style="color:#666; font-size:0.8rem">(${rateDescription})</small><br>
+        <strong style="color: #888;">🛣️ Tolls:</strong> <span style="color: #fff;">R${tolls.toFixed(2)}</span>${plazaNote}<br>
+        <hr style="border-color: #444;">
+        <strong style="color: #4CAF50;">💰 Total Cost:</strong> <span style="color: #fff;">R${totalCost.toFixed(2)}</span><br>
+        <strong style="color: #888;">📈 Profit (${profitPercent}%):</strong> <span style="color: #fff;">R${profit.toFixed(2)}</span>
     `;
+
+    const priceDisplay = document.getElementById("priceDisplay");
+    const finalPriceDisplay = document.getElementById("finalPriceDisplay");
+    const rateTypeBadge = document.getElementById("rateTypeBadge");
+    const rateTypeNote = document.getElementById("rateTypeNote");
+    
+    finalPriceDisplay.textContent = `R${finalPrice.toFixed(2)}`;
+    rateTypeBadge.textContent = rateType === 'hour' ? 'R/Hour' : 'R/Km';
+    rateTypeNote.textContent = rateType === 'hour' ? 
+        `Driver charged per hour @ R${driverRate.toFixed(2)}/hr` : 
+        `Driver charged per km @ R${driverRate.toFixed(2)}/km`;
+    
+    priceDisplay.style.display = 'block';
+    priceDisplay.classList.add('price-revealed');
+    
+    document.getElementById("pdfBtn").disabled = false;
+    calculated = true;
 }
 
-// PDF GENERATOR
+// ============== PDF GENERATOR (WITH LOGO UPLOAD SUPPORT) ==============
 function generatePDF() {
-
+    if (!calculated) {
+        alert("Please calculate a quote first before downloading PDF.");
+        return;
+    }
+    
     const { jsPDF } = window.jspdf;
-    let doc = new jsPDF();
-
-    doc.text("Transport Quote", 20, 20);
-    doc.text("Final Price: R" + finalPrice.toFixed(2), 20, 40);
-
-    doc.save("quote.pdf");
+    const doc = new jsPDF();
+    
+    // Header background
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, 0, 210, 45, 'F');
+    
+    // LOGO IMAGE (If uploaded)
+    if (logoBase64) {
+        try {
+            // Determine image type from base64 string
+            const imageType = logoBase64.includes('image/png') ? 'PNG' : 'JPEG';
+            doc.addImage(logoBase64, imageType, 15, 10, 25, 25);
+            // Shift text to right if logo exists
+            doc.setTextColor(76, 175, 80);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Reakgona Tours", 50, 20);
+            
+            doc.setTextColor(136, 136, 136);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text("TRAVEL WITH EASE", 50, 27);
+        } catch (e) {
+            console.error("Logo error:", e);
+            // Fallback to text only if logo fails
+            doc.setTextColor(76, 175, 80);
+            doc.setFontSize(26);
+            doc.setFont("helvetica", "bold");
+            doc.text("Reakgona Tours", 105, 22, { align: "center" });
+            doc.setTextColor(136, 136, 136);
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            doc.text("TRAVEL WITH EASE", 105, 30, { align: "center" });
+        }
+    } else {
+        // Text Only (Fallback)
+        doc.setTextColor(76, 175, 80);
+        doc.setFontSize(26);
+        doc.setFont("helvetica", "bold");
+        doc.text("Reakgona Tours", 105, 22, { align: "center" });
+        
+        doc.setTextColor(136, 136, 136);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text("TRAVEL WITH EASE", 105, 30, { align: "center" });
+    }
+    
+    // Green separator line
+    doc.setDrawColor(76, 175, 80);
+    doc.setLineWidth(2);
+    doc.line(15, 38, 195, 38);
+    
+    // Quote title
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("TRANSPORT QUOTE", 105, 55, { align: "center" });
+    
+    // Quote metadata
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Quote Date: ${currentQuote.date}`, 14, 65);
+    doc.text(`Quote ID: RT-${Date.now().toString().slice(-8)}`, 140, 65);
+    
+    // CLIENT INFORMATION BOX
+    doc.setFillColor(76, 175, 80);
+    doc.rect(14, 72, 182, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("CLIENT INFORMATION", 20, 78);
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(`Client Name: ${currentQuote.clientName}`, 20, 88);
+    doc.text(`Contact: ${currentQuote.clientPhone}`, 110, 88);
+    if (currentQuote.clientEmail) {
+        doc.text(`Email: ${currentQuote.clientEmail}`, 20, 94);
+    }
+    doc.text(`Pickup Date: ${currentQuote.pickupDate}`, 110, 94);
+    
+    // Route info box - FIXED HEIGHT for multi-line addresses
+    doc.setFillColor(30, 30, 30);
+    doc.rect(14, 100, 182, 50, 'F');
+    doc.setTextColor(76, 175, 80);
+    doc.setFont("helvetica", "bold");
+    doc.text("ROUTE DETAILS", 20, 110);
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    
+    const fromLines = doc.splitTextToSize(`From: ${currentQuote.from}`, 85);
+    const toLines = doc.splitTextToSize(`To: ${currentQuote.to}`, 85);
+    
+    let currentY = 120;
+    doc.text(fromLines, 20, currentY);
+    currentY += (fromLines.length * 5) + 3;
+    
+    doc.text(toLines, 20, currentY);
+    currentY += (toLines.length * 5) + 8;
+    
+    doc.text(`Distance: ${currentQuote.distance} km`, 110, 120);
+    doc.text(`Est. Time: ${currentQuote.time} hours`, 110, 128);
+    doc.text(`Vehicle: ${currentQuote.vehicle}`, 110, 136);
+    
+    // CLEAN SUMMARY
+    doc.setFillColor(245, 245, 245);
+    doc.rect(14, 155, 182, 50, 'F');
+    
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(76, 175, 80);
+    doc.text("QUOTE SUMMARY", 20, 165);
+    
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    doc.text(`This quote includes all costs:`, 20, 175);
+    doc.text(`• Fuel`, 25, 182);
+    doc.text(`• Driver`, 25, 189);
+    doc.text(`• Vehicle Maintenance`, 25, 196);
+    doc.text(`• Toll Fees`, 25, 203);
+    
+    // Final price highlight
+    doc.setFillColor(76, 175, 80);
+    doc.rect(14, 210, 182, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14);
+    doc.text("TOTAL QUOTE", 105, 222, { align: "center" });
+    doc.setFontSize(24);
+    doc.setFont("helvetica", "bold");
+    doc.text(`R${currentQuote.finalPrice}`, 105, 238, { align: "center" });
+    
+    // Additional Notes
+    if (currentQuote.clientNotes) {
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text("Special Requirements:", 14, 248);
+        const notesLines = doc.splitTextToSize(currentQuote.clientNotes, 182);
+        doc.text(notesLines, 14, 253);
+    }
+    
+    // CONTACT INFO FOOTER - FIXED (no emojis)
+    doc.setFillColor(10, 10, 10);
+    doc.rect(0, 260, 210, 37, 'F');
+    
+    doc.setTextColor(76, 175, 80);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("WWW.REAKGONATOURS.CO.ZA", 105, 270, { align: "center" });
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text("Ramokgoro - 079 098 8801", 14, 280);
+    doc.text("Mabombela - 073 952 8645", 14, 287);
+    doc.text("Email: enquiries@reakgonatours.co.za", 14, 294);
+    
+    doc.setTextColor(136, 136, 136);
+    doc.setFontSize(8);
+    doc.text("Thank you for choosing Reakgona Tours - Travel with Ease!", 105, 302, { align: "center" });
+    
+    // Save PDF
+    const clientName = currentQuote.clientName.replace(/\s+/g,'').substring(0, 15);
+    const fromTown = currentQuote.from.split(',')[0].replace(/\s+/g,'').substring(0, 10);
+    const filename = `Reakgona-Quote-${clientName}-${fromTown}.pdf`;
+    doc.save(filename);
 }
 
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleRateInput();
+    setMinimumDate();
+});
 </script>
 
-<!-- Bootstrap JS (required for collapse) -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
