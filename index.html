@@ -171,24 +171,24 @@ transform: none;
 box-shadow: none;
 opacity: 0.5;
 }
-.rate-toggle {
+.rate-toggle, .journey-toggle {
 display: flex;
 gap: 10px;
 margin-bottom: 15px;
 }
-.rate-toggle .form-check {
+.rate-toggle .form-check, .journey-toggle .form-check {
 flex: 1;
 }
-.rate-toggle .form-check-input:checked {
+.rate-toggle .form-check-input:checked, .journey-toggle .form-check-input:checked {
 background-color: #4CAF50;
 border-color: #4CAF50;
 }
-.rate-toggle .form-check-label {
+.rate-toggle .form-check-label, .journey-toggle .form-check-label {
 color: #ccc;
 font-size: 0.9rem;
 cursor: pointer;
 }
-.rate-toggle .form-check-input:checked + .form-check-label {
+.rate-toggle .form-check-input:checked + .form-check-label, .journey-toggle .form-check-input:checked + .form-check-label {
 color: #4CAF50;
 font-weight: 600;
 }
@@ -245,6 +245,15 @@ margin: 10px 0;
 border: 1px solid #4CAF50;
 border-radius: 5px;
 display: none;
+}
+.journey-badge {
+background: #4CAF50;
+color: #000;
+padding: 4px 10px;
+border-radius: 4px;
+font-size: 0.8rem;
+font-weight: 700;
+margin-left: 10px;
 }
 </style>
 </head>
@@ -347,6 +356,18 @@ display: none;
 <option value="van">Minibus / Van (Hyundai H1)</option>
 <option value="truck">Truck</option>
 </select>
+<!-- JOURNEY TYPE TOGGLE -->
+<label class="form-label">Journey Type</label>
+<div class="journey-toggle">
+<div class="form-check">
+<input class="form-check-input" type="radio" name="journeyType" id="journeyOneWay" value="oneway" checked onchange="updateJourneyType()">
+<label class="form-check-label" for="journeyOneWay">📍 One Way</label>
+</div>
+<div class="form-check">
+<input class="form-check-input" type="radio" name="journeyType" id="journeyReturn" value="return" onchange="updateJourneyType()">
+<label class="form-check-label" for="journeyReturn">🔄 Return Journey</label>
+</div>
+</div>
 <label class="form-label">Fuel Price (R/L)</label>
 <input id="fuelPrice" type="number" class="form-control mb-3" value="23">
 <label class="form-label">Tolls (R) <span class="toll-badge">Auto-calculated</span></label>
@@ -380,7 +401,10 @@ display: none;
 <div id="priceDisplay" class="price-display" style="display: none;">
 <div style="display:flex; justify-content:space-between; align-items:center;">
 <span style="color:#888; font-size:0.95rem;">FINAL QUOTE</span>
-<span id="rateTypeBadge" class="badge" style="background:#333; color:#4CAF50; font-size:0.75rem;">R/Hour</span>
+<div>
+<span id="journeyTypeBadge" class="journey-badge">One Way</span>
+<span id="rateTypeBadge" class="badge" style="background:#333; color:#4CAF50; font-size:0.75rem; margin-left:5px;">R/Hour</span>
+</div>
 </div>
 <div class="final-price" id="finalPriceDisplay">R0.00</div>
 <div class="rate-type" id="rateTypeNote">Driver charged per hour</div>
@@ -569,6 +593,11 @@ logoBase64 = null;
 document.getElementById('logoUpload').value = '';
 document.getElementById('logoPreview').style.display = 'none';
 }
+// ============== JOURNEY TYPE ==============
+let journeyType = 'oneway';
+function updateJourneyType() {
+journeyType = document.querySelector('input[name="journeyType"]:checked').value;
+}
 // ============== TOLL PLAZA DATABASE ==============
 const tollPlazas = [
 {name:"Grasmere Main", lat:-26.2833, lon:28.2167, price:27.50, route:"N1-JHB-CPT"},
@@ -740,31 +769,35 @@ const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${st
 const distance = route.routes[0].distance / 1000;
 const time = route.routes[0].duration / 3600;
 const tollResult = calculateAutoTolls(startLat, startLon, endLat, endLon);
-document.getElementById("tolls").value = tollResult.total.toFixed(2);
-const plazaNote = tollResult.plazas.length > 0 ? `<br><small style="color: #4CAF50;">🛣️ Auto-tolls: ${tollResult.plazas.join(", ")}</small>` : `<br><small style="color: #888;">🛣️ No toll plazas detected</small>`;
-calculateCost(distance, time, plazaNote, fromAddress, toAddress);
+const tollMultiplier = journeyType === 'return' ? 2 : 1;
+document.getElementById("tolls").value = (tollResult.total * tollMultiplier).toFixed(2);
+const plazaNote = tollResult.plazas.length > 0 ?
+`<br><small style="color: #4CAF50;">🛣️ Auto-tolls: ${tollResult.plazas.join(", ")}${journeyType === 'return' ? ' (x2 for return)' : ''}</small>` :
+`<br><small style="color: #888;">🛣️ No toll plazas detected on this route</small>`;
+calculateCost(distance, time, plazaNote, fromAddress, toAddress, tollMultiplier);
 } catch (error) {
 console.error("Error:", error);
 alert("Error calculating route. Please try again.");
 }
 }
 // ============== COST CALCULATION ==============
-function calculateCost(distance, time, plazaNote="", from="", to="") {
+function calculateCost(distance, time, plazaNote="", from="", to="", tollMultiplier=1) {
 const fuelPrice = parseFloat(document.getElementById("fuelPrice").value) || 23;
 const tolls = parseFloat(document.getElementById("tolls").value) || 0;
 const driverRate = parseFloat(document.getElementById("driverRate").value) || 0;
 const profitPercent = parseFloat(document.getElementById("profit").value) || 0;
 const rateType = document.querySelector('input[name="rateType"]:checked').value;
-const fuelUsed = (distance / 100) * consumption;
+const journeyMultiplier = journeyType === 'return' ? 2 : 1;
+const fuelUsed = (distance / 100) * consumption * journeyMultiplier;
 const fuelCost = fuelUsed * fuelPrice;
-const maintenance = distance * maintenanceRate;
+const maintenance = distance * maintenanceRate * journeyMultiplier;
 let driverCost, rateDescription;
 if (rateType === 'hour') {
-driverCost = time * driverRate;
-rateDescription = `R${driverRate.toFixed(2)}/hour × ${time.toFixed(1)} hrs`;
+driverCost = time * driverRate * journeyMultiplier;
+rateDescription = `R${driverRate.toFixed(2)}/hour × ${(time * journeyMultiplier).toFixed(1)} hrs`;
 } else {
-driverCost = distance * driverRate;
-rateDescription = `R${driverRate.toFixed(2)}/km × ${distance.toFixed(1)} km`;
+driverCost = distance * driverRate * journeyMultiplier;
+rateDescription = `R${driverRate.toFixed(2)}/km × ${(distance * journeyMultiplier).toFixed(1)} km`;
 }
 const totalCost = fuelCost + maintenance + driverCost + tolls;
 const profit = totalCost * (profitPercent / 100);
@@ -777,8 +810,10 @@ clientNotes: document.getElementById("clientNotes").value.trim(),
 pickupDate: document.getElementById("pickupDate").value,
 from: from,
 to: to,
-distance: distance.toFixed(1),
-time: time.toFixed(1),
+distance: (distance * journeyMultiplier).toFixed(1),
+oneWayDistance: distance.toFixed(1),
+time: (time * journeyMultiplier).toFixed(1),
+oneWayTime: time.toFixed(1),
 fuelCost: fuelCost.toFixed(2),
 maintenance: maintenance.toFixed(2),
 driverCost: driverCost.toFixed(2),
@@ -790,15 +825,18 @@ totalCost: totalCost.toFixed(2),
 profit: profit.toFixed(2),
 finalPrice: finalPrice.toFixed(2),
 date: new Date().toLocaleDateString('en-ZA'),
-vehicle: document.getElementById("vehicle").options[document.getElementById("vehicle").selectedIndex].text
+vehicle: document.getElementById("vehicle").options[document.getElementById("vehicle").selectedIndex].text,
+journeyType: journeyType
 };
+const journeyLabel = journeyType === 'return' ? 'Return Journey' : 'One Way';
 document.getElementById("output").innerHTML = `
 <strong style="color: #fff;">👤 Client:</strong> <span style="color: #4CAF50;">${currentQuote.clientName}</span><br>
 <strong style="color: #fff;">📅 Pickup:</strong> <span style="color: #fff;">${currentQuote.pickupDate}</span><br>
+<strong style="color: #fff;">🔄 Journey:</strong> <span style="color: #4CAF50;">${journeyLabel}</span><br>
 <strong style="color: #fff;">📍 Route:</strong> <span style="color: #4CAF50;">${from.split(',')[0]} → ${to.split(',')[0]}</span><br>
 <strong style="color: #fff;">🚗 Vehicle:</strong> <span style="color: #fff;">${currentQuote.vehicle}</span><br>
-<strong style="color: #fff;">📏 Distance:</strong> <span style="color: #fff;">${distance.toFixed(1)} km</span><br>
-<strong style="color: #fff;">⏱️ Est. Time:</strong> <span style="color: #fff;">${time.toFixed(1)} hours</span><br><br>
+<strong style="color: #fff;">📏 Distance:</strong> <span style="color: #fff;">${currentQuote.distance} km</span>${journeyType === 'return' ? `<small style="color:#666"> (${currentQuote.oneWayDistance} km each way)</small>` : ''}<br>
+<strong style="color: #fff;">⏱️ Est. Time:</strong> <span style="color: #fff;">${currentQuote.time} hours</span>${journeyType === 'return' ? `<small style="color:#666"> (${currentQuote.oneWayTime} hrs each way)</small>` : ''}<br><br>
 <strong style="color: #888;">⛽ Fuel:</strong> <span style="color: #fff;">R${fuelCost.toFixed(2)}</span><br>
 <strong style="color: #888;">🔧 Maintenance:</strong> <span style="color: #fff;">R${maintenance.toFixed(2)}</span><br>
 <strong style="color: #888;">👨‍✈️ Driver:</strong> <span style="color: #fff;">R${driverCost.toFixed(2)}</span> <small style="color:#666; font-size:0.8rem">(${rateDescription})</small><br>
@@ -811,7 +849,9 @@ const priceDisplay = document.getElementById("priceDisplay");
 const finalPriceDisplay = document.getElementById("finalPriceDisplay");
 const rateTypeBadge = document.getElementById("rateTypeBadge");
 const rateTypeNote = document.getElementById("rateTypeNote");
+const journeyTypeBadge = document.getElementById("journeyTypeBadge");
 finalPriceDisplay.textContent = `R${finalPrice.toFixed(2)}`;
+journeyTypeBadge.textContent = journeyLabel;
 rateTypeBadge.textContent = rateType === 'hour' ? 'R/Hour' : 'R/Km';
 rateTypeNote.textContent = rateType === 'hour' ? `Driver charged per hour @ R${driverRate.toFixed(2)}/hr` : `Driver charged per km @ R${driverRate.toFixed(2)}/km`;
 priceDisplay.style.display = 'block';
@@ -819,7 +859,7 @@ priceDisplay.classList.add('price-revealed');
 document.getElementById("pdfBtn").disabled = false;
 calculated = true;
 }
-// ============== PDF GENERATOR (QUOTE SUMMARY REMOVED) ==============
+// ============== PDF GENERATOR (SIMPLIFIED - NO QUOTE SUMMARY) ==============
 function generatePDF() {
 if (!calculated) { alert("Please calculate a quote first before downloading PDF."); return; }
 const { jsPDF } = window.jspdf;
@@ -864,93 +904,107 @@ doc.text("TRAVEL WITH EASE", 105, 30, { align: "center" });
 doc.setDrawColor(76, 175, 80);
 doc.setLineWidth(2);
 doc.line(15, 38, 195, 38);
-// Quote title
+// Quote title WITH JOURNEY TYPE
+const journeyLabel = currentQuote.journeyType === 'return' ? 'RETURN JOURNEY' : 'ONE WAY';
 doc.setTextColor(0, 0, 0);
 doc.setFontSize(18);
 doc.setFont("helvetica", "bold");
-doc.text("TRANSPORT QUOTE", 105, 55, { align: "center" });
+doc.text(`TRANSPORT QUOTE`, 105, 55, { align: "center" });
+// Journey Type Badge
+doc.setFillColor(76, 175, 80);
+doc.rect(75, 60, 60, 8, 'F');
+doc.setTextColor(0, 0, 0);
+doc.setFontSize(10);
+doc.setFont("helvetica", "bold");
+doc.text(journeyLabel, 105, 66, { align: "center" });
 // Quote metadata
 doc.setFontSize(10);
 doc.setFont("helvetica", "normal");
 doc.setTextColor(100, 100, 100);
-doc.text(`Quote Date: ${currentQuote.date}`, 14, 65);
-doc.text(`Quote ID: RT-${Date.now().toString().slice(-8)}`, 140, 65);
+doc.text(`Quote Date: ${currentQuote.date}`, 14, 80);
+doc.text(`Quote ID: RT-${Date.now().toString().slice(-8)}`, 140, 80);
 // CLIENT INFORMATION BOX
 doc.setFillColor(76, 175, 80);
-doc.rect(14, 72, 182, 8, 'F');
+doc.rect(14, 87, 182, 8, 'F');
 doc.setTextColor(255, 255, 255);
 doc.setFont("helvetica", "bold");
 doc.setFontSize(11);
-doc.text("CLIENT INFORMATION", 20, 78);
+doc.text("CLIENT INFORMATION", 20, 93);
 doc.setTextColor(0, 0, 0);
 doc.setFont("helvetica", "normal");
 doc.setFontSize(9);
-doc.text(`Client Name: ${currentQuote.clientName}`, 20, 88);
-doc.text(`Contact: ${currentQuote.clientPhone}`, 110, 88);
-if (currentQuote.clientEmail) { doc.text(`Email: ${currentQuote.clientEmail}`, 20, 94); }
-doc.text(`Pickup Date: ${currentQuote.pickupDate}`, 110, 94);
+doc.text(`Client Name: ${currentQuote.clientName}`, 20, 103);
+doc.text(`Contact: ${currentQuote.clientPhone}`, 110, 103);
+if (currentQuote.clientEmail) { doc.text(`Email: ${currentQuote.clientEmail}`, 20, 109); }
+doc.text(`Pickup Date: ${currentQuote.pickupDate}`, 110, 109);
 // Route info box
 doc.setFillColor(30, 30, 30);
-doc.rect(14, 100, 182, 50, 'F');
+doc.rect(14, 115, 182, 50, 'F');
 doc.setTextColor(76, 175, 80);
 doc.setFont("helvetica", "bold");
-doc.text("ROUTE DETAILS", 20, 110);
+doc.text("ROUTE DETAILS", 20, 125);
 doc.setTextColor(255, 255, 255);
 doc.setFont("helvetica", "normal");
 doc.setFontSize(9);
 const fromLines = doc.splitTextToSize(`From: ${currentQuote.from}`, 85);
 const toLines = doc.splitTextToSize(`To: ${currentQuote.to}`, 85);
-let currentY = 120;
+let currentY = 135;
 doc.text(fromLines, 20, currentY);
 currentY += (fromLines.length * 5) + 3;
 doc.text(toLines, 20, currentY);
 currentY += (toLines.length * 5) + 8;
-doc.text(`Distance: ${currentQuote.distance} km`, 110, 120);
-doc.text(`Est. Time: ${currentQuote.time} hours`, 110, 128);
-doc.text(`Vehicle: ${currentQuote.vehicle}`, 110, 136);
+doc.text(`Distance: ${currentQuote.distance} km`, 110, 135);
+if (currentQuote.journeyType === 'return') {
+doc.text(`(${currentQuote.oneWayDistance} km each way)`, 110, 141);
+}
+doc.text(`Est. Time: ${currentQuote.time} hours`, 110, currentQuote.journeyType === 'return' ? 147 : 143);
+doc.text(`Vehicle: ${currentQuote.vehicle}`, 110, currentQuote.journeyType === 'return' ? 153 : 151);
 // Final price highlight - MOVED UP (QUOTE SUMMARY REMOVED)
 doc.setFillColor(76, 175, 80);
-doc.rect(14, 155, 182, 35, 'F');
+doc.rect(14, 170, 182, 35, 'F');
 doc.setTextColor(255, 255, 255);
 doc.setFontSize(14);
-doc.text("TOTAL QUOTE", 105, 167, { align: "center" });
+doc.text("TOTAL QUOTE", 105, 182, { align: "center" });
 doc.setFontSize(24);
 doc.setFont("helvetica", "bold");
-doc.text(`R${currentQuote.finalPrice}`, 105, 183, { align: "center" });
+doc.text(`R${currentQuote.finalPrice}`, 105, 198, { align: "center" });
 // Additional Notes
 if (currentQuote.clientNotes) {
 doc.setFontSize(9);
 doc.setTextColor(100, 100, 100);
-doc.text("Special Requirements:", 14, 198);
+doc.text("Special Requirements:", 14, 213);
 const notesLines = doc.splitTextToSize(currentQuote.clientNotes, 182);
-doc.text(notesLines, 14, 203);
+doc.text(notesLines, 14, 218);
 }
 // CONTACT INFO FOOTER
 doc.setFillColor(10, 10, 10);
-doc.rect(0, 210, 210, 87, 'F');
+doc.rect(0, 225, 210, 72, 'F');
 doc.setTextColor(76, 175, 80);
 doc.setFontSize(11);
 doc.setFont("helvetica", "bold");
-doc.text("WWW.REAKGONATOURS.CO.ZA", 105, 220, { align: "center" });
+doc.text("WWW.REAKGONATOURS.CO.ZA", 105, 235, { align: "center" });
 doc.setTextColor(255, 255, 255);
 doc.setFontSize(9);
 doc.setFont("helvetica", "normal");
-doc.text("Ramokgoro - 079 098 8801", 14, 230);
-doc.text("Mabombela - 073 952 8645", 14, 237);
-doc.text("Email: enquiries@reakgonatours.co.za", 14, 244);
+doc.text("Ramokgoro - 079 098 8801", 14, 245);
+doc.text("Mabombela - 073 952 8645", 14, 252);
+doc.text("Email: enquiries@reakgonatours.co.za", 14, 259);
 doc.setTextColor(136, 136, 136);
 doc.setFontSize(8);
-doc.text("Thank you for choosing Reakgona Tours - Travel with Ease!", 105, 252, { align: "center" });
+doc.text("Thank you for choosing Reakgona Tours - Travel with Ease!", 105, 267, { align: "center" });
+doc.text("Quote valid for 7 days from issue date", 105, 274, { align: "center" });
+doc.text("Terms & Conditions apply", 105, 281, { align: "center" });
 // Save PDF
 const clientName = currentQuote.clientName.replace(/\s+/g,'').substring(0, 15);
 const fromTown = currentQuote.from.split(',')[0].replace(/\s+/g,'').substring(0, 10);
-const filename = `Reakgona-Quote-${clientName}-${fromTown}.pdf`;
+const filename = `Reakgona-Quote-${clientName}-${fromTown}-${currentQuote.journeyType}.pdf`;
 doc.save(filename);
 }
 // Initialize on load
 document.addEventListener('DOMContentLoaded', function() {
 toggleRateInput();
 setMinimumDate();
+updateJourneyType();
 });
 </script>
 <!-- Bootstrap JS -->
